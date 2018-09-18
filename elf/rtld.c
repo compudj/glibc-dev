@@ -43,6 +43,7 @@
 #include <stap-probe.h>
 #include <stackinfo.h>
 #include <not-cancel.h>
+#include <rseq-internal.h>
 
 #include <assert.h>
 
@@ -156,6 +157,25 @@ strong_alias (__pointer_chk_guard_local, __pointer_chk_guard)
 #else
 # define SECURE_PATH_LIMIT 1024
 #endif
+
+/* Advertise Restartable Sequences registration ownership across
+   application and shared libraries.
+
+   Libraries and applications must check whether this variable is zero or
+   non-zero if they wish to perform rseq registration on their own. If it
+   is zero, it means restartable sequence registration is not handled, and
+   the library or application is free to perform rseq registration. In
+   that case, the library or application is taking ownership of rseq
+   registration, and may set __rseq_handled to 1. It may then set it back
+   to 0 after it completes unregistering rseq.
+
+   If __rseq_handled is found to be non-zero, it means that another
+   library (or the application) is currently handling rseq registration.
+
+   Typical use of __rseq_handled is within library constructors and
+   destructors, or at program startup.  */
+
+int __rseq_handled;
 
 /* Check that AT_SECURE=0, or that the passed name does not contain
    directories and is not overly long.  Reject empty names
@@ -2313,6 +2333,12 @@ ERROR: '%s': cannot process note segment.\n", _dl_argv[0]);
 
       rtld_timer_accum (&relocate_time, start);
     }
+
+  /* Publicize rseq registration ownership.  This must be performed
+     after rtld re-relocation, before invoking constructors of
+     preloaded libraries.  IFUNC resolvers are called before this
+     initialization, so they may not observe the initialized state.  */
+  rseq_init ();
 
   /* Do any necessary cleanups for the startup OS interface code.
      We do these now so that no calls are made after rtld re-relocation

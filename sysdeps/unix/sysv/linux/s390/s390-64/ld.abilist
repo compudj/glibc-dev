@@ -6,3 +6,4 @@ GLIBC_2.2 free F
 GLIBC_2.2 malloc F
 GLIBC_2.2 realloc F
 GLIBC_2.3 __tls_get_offset F
+GLIBC_2.31 __rseq_handled D 0x4

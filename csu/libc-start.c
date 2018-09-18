@@ -22,6 +22,8 @@
 #include <ldsodefs.h>
 #include <exit-thread.h>
 #include <libc-internal.h>
+#include <rseq-internal.h>
+#include <ldsodefs.h>
 
 #include <elf/dl-tunables.h>
 
@@ -140,7 +142,13 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
 
   __libc_multiple_libcs = &_dl_starting_up && !_dl_starting_up;
 
-#ifndef SHARED
+#ifdef SHARED
+  if (rtld_active ())
+    {
+      /* Register rseq ABI to the kernel.   */
+      (void) rseq_register_current_thread ();
+    }
+#else
   _dl_relocate_static_pie ();
 
   char **ev = &argv[argc + 1];
@@ -231,7 +239,9 @@ LIBC_START_MAIN (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL),
   __pointer_chk_guard_local = pointer_chk_guard;
 # endif
 
-#endif /* !SHARED  */
+    /* Register rseq ABI to the kernel.   */
+    (void) rseq_register_current_thread ();
+#endif
 
   /* Register the destructor of the dynamic linker if there is any.  */
   if (__glibc_likely (rtld_fini != NULL))

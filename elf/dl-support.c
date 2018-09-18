@@ -34,6 +34,7 @@
 #include <unsecvars.h>
 #include <hp-timing.h>
 #include <stackinfo.h>
+#include <rseq-internal.h>
 
 extern char *__progname;
 char **_dl_argv = &__progname;	/* This is checked for some error messages.  */
@@ -215,6 +216,24 @@ __rtld_lock_define_initialized_recursive (, _dl_load_lock)
    that list.  */
 __rtld_lock_define_initialized_recursive (, _dl_load_write_lock)
 
+/* Advertise Restartable Sequences registration ownership across
+   application and shared libraries.
+
+   Libraries and applications must check whether this variable is zero or
+   non-zero if they wish to perform rseq registration on their own. If it
+   is zero, it means restartable sequence registration is not handled, and
+   the library or application is free to perform rseq registration. In
+   that case, the library or application is taking ownership of rseq
+   registration, and may set __rseq_handled to 1. It may then set it back
+   to 0 after it completes unregistering rseq.
+
+   If __rseq_handled is found to be non-zero, it means that another
+   library (or the application) is currently handling rseq registration.
+
+   Typical use of __rseq_handled is within library constructors and
+   destructors, or at program startup.  */
+
+int __rseq_handled;
 
 #ifdef HAVE_AUX_VECTOR
 int _dl_clktck;
@@ -375,6 +394,9 @@ _dl_non_dynamic_init (void)
 	  _dl_stack_flags = _dl_phdr[i].p_flags;
 	  break;
 	}
+
+  /* Publicize rseq registration ownership.  */
+  rseq_init ();
 }
 
 #ifdef DL_SYSINFO_IMPLEMENTATION

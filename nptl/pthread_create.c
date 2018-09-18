@@ -33,6 +33,7 @@
 #include <default-sched.h>
 #include <futex-internal.h>
 #include <tls-setup.h>
+#include <rseq-internal.h>
 #include "libioP.h"
 
 #include <shlib-compat.h>
@@ -378,6 +379,7 @@ __free_tcb (struct pthread *pd)
 START_THREAD_DEFN
 {
   struct pthread *pd = START_THREAD_SELF;
+  bool has_rseq = false;
 
   /* Initialize resolver state pointer.  */
   __resp = &pd->res;
@@ -388,6 +390,9 @@ START_THREAD_DEFN
   /* Allow setxid from now onwards.  */
   if (__glibc_unlikely (atomic_exchange_acq (&pd->setxid_futex, 0) == -2))
     futex_wake (&pd->setxid_futex, 1, FUTEX_PRIVATE);
+
+  /* Register rseq TLS to the kernel. */
+  has_rseq = !rseq_register_current_thread ();
 
 #ifdef __NR_set_robust_list
 # ifndef __ASSUME_SET_ROBUST_LIST
@@ -565,6 +570,10 @@ START_THREAD_DEFN
       while (robust != (void *) &pd->robust_head);
     }
 #endif
+
+  /* Unregister rseq TLS from kernel. */
+  if (has_rseq && rseq_unregister_current_thread ())
+    abort();
 
   advise_stack_range (pd->stackblock, pd->stackblock_size, (uintptr_t) pd,
 		      pd->guardsize);

@@ -1,3 +1,81 @@
+2019-08-06  Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+	* NEWS: Add Restartable Sequences feature description.
+	* csu/libc-start.c: Perform rseq(2) registration at C startup.
+	* elf/rtld.c: Initialize __rseq_handled at dynamic linker
+	startup for shared libc.
+	* elf/dl-support.c: Initialize __rseq_handled at dynamic linker
+	startup for static libc.
+	* nptl/pthread_create.c: Perform rseq(2) registration at thread
+	creation, unregistration at thread exit.
+	* sysdeps/unix/sysv/linux/Makefile: Add rseq-sym, sys/rseq.h,
+	bits/rseq.h.
+	* sysdeps/unix/sysv/linux/Versions: Export __rseq_abi from libc
+	and __rseq_handled from ld.
+	* sysdeps/unix/sysv/linux/aarch64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/aarch64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/alpha/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/alpha/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/arm/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/arm/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/csky/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/csky/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/hppa/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/hppa/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/i386/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/i386/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/ia64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/ia64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/m68k/coldfire/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/m68k/coldfire/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/m68k/m680x0/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/m68k/m680x0/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/microblaze/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/microblaze/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/mips/mips32/fpu/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/mips/mips32/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/mips/mips32/nofpu/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/mips/mips64/n32/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/mips/mips64/n32/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/mips/mips64/n64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/mips/mips64/n64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/nios2/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/nios2/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc32/fpu/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc32/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc32/nofpu/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc64/be/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc64/be/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc64/le/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/powerpc64/le/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/riscv/rv64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/s390/s390-32/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/s390/s390-32/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/s390/s390-64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/s390/s390-64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/sh/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/sh/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/sparc/sparc32/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/sparc/sparc32/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/sparc/sparc64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/sparc/sparc64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/x86_64/64/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/x86_64/64/libc.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/x86_64/x32/ld.abilist: Likewise.
+	* sysdeps/unix/sysv/linux/x86_64/x32/libc.abilist: Likewise.
+	* misc/rseq-internal.h: New file.
+	* sysdeps/unix/sysv/linux/rseq-internal.h: Likewise.
+	* sysdeps/unix/sysv/linux/rseq-sym.c: Likewise.
+	* sysdeps/unix/sysv/linux/sys/rseq.h: Likewise.
+	* sysdeps/unix/sysv/linux/bits/rseq.h: Likewise.
+	* sysdeps/unix/sysv/linux/aarch64/bits/rseq.h: Likewise.
+	* sysdeps/unix/sysv/linux/arm/bits/rseq.h: Likewise.
+	* sysdeps/unix/sysv/linux/mips/bits/rseq.h: Likewise.
+	* sysdeps/unix/sysv/linux/powerpc/bits/rseq.h: Likewise.
+	* sysdeps/unix/sysv/linux/s390/bits/rseq.h: Likewise.
+	* sysdeps/unix/sysv/linux/x86/bits/rseq.h: Likewise.
+
 2019-08-01  Carlos O'Donell <carlos@redhat.com>
 
 	* version.h (RELEASE): Set to "stable".

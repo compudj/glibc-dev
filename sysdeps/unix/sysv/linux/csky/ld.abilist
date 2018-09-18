@@ -7,3 +7,4 @@ GLIBC_2.29 calloc F
 GLIBC_2.29 free F
 GLIBC_2.29 malloc F
 GLIBC_2.29 realloc F
+GLIBC_2.31 __rseq_handled D 0x4
