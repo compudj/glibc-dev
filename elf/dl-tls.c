@@ -31,7 +31,7 @@
 
 /* Amount of excess space to allocate in the static TLS area
    to allow dynamic loading of modules defining IE-model TLS data.  */
-#define TLS_STATIC_SURPLUS	64 + DL_NNS * 100
+#define TLS_STATIC_SURPLUS	64 + DL_NNS * 176
 
 
 /* Out-of-memory handler.  */
