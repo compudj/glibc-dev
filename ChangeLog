@@ -1,5 +1,10 @@
 2019-08-06  Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 
+	* sysdeps/unix/sysv/linux/sched_getcpu.c: use rseq cpu_id TLS on
+	Linux.
+
+2019-08-06  Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
 	* NEWS: Add Restartable Sequences feature description.
 	* csu/libc-start.c: Perform rseq(2) registration at C startup.
 	* elf/rtld.c: Initialize __rseq_handled at dynamic linker
