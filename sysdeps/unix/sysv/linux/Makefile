@@ -55,7 +55,7 @@ tests += tst-clone tst-clone2 tst-clone3 tst-fanotify tst-personality \
 	 test-errno-linux tst-memfd_create tst-mlock2 tst-pkey \
 	 tst-rlimit-infinity tst-ofdlocks tst-gettid tst-gettid-kill \
 	 tst-tgkill
-tests-internal += tst-ofdlocks-compat
+tests-internal += tst-ofdlocks-compat tst-rseq
 
 # Generate the list of SYS_* macros for the system calls (__NR_*
 # macros).  The file syscall-names.list contains all possible system
@@ -245,5 +245,5 @@ ifeq ($(subdir),nptl)
 tests += tst-align-clone tst-getpid1 \
 	tst-thread-affinity-pthread tst-thread-affinity-pthread2 \
 	tst-thread-affinity-sched
-tests-internal += tst-setgetname
+tests-internal += tst-setgetname tst-rseq-nptl
 endif
