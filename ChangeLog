@@ -1,5 +1,13 @@
 2019-08-06  Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 
+	* support/Makefile: Add xpthread_key_create and xpthread_key_delete.
+	* support/xthread.h: Add prototype for xpthread_key_create and
+	xpthread_key_delete.
+	* support/xpthread_key_create.c: New file.
+	* support/xpthread_key_delete.c: New file.
+
+2019-08-06  Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
 	* sysdeps/unix/sysv/linux/sched_getcpu.c: use rseq cpu_id TLS on
 	Linux.
 
