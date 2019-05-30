@@ -70,6 +70,7 @@ do_rseq_main_test (void)
   return 0;
 }
 
+#if 0
 static void
 cancel_routine (void *arg)
 {
@@ -91,16 +92,19 @@ test_cancel_thread (void)
     usleep (100);
   pthread_cleanup_pop (0);
 }
+#endif
 
 static void *
 thread_function (void * arg)
 {
-  int i = (int) (intptr_t) arg;
+  //int i = (int) (intptr_t) arg;
 
   if (raise (SIGUSR1))
     FAIL_EXIT1 ("error raising signal");
+#if 0
   if (i == 0)
     test_cancel_thread ();
+#endif
   if (pthread_setspecific (rseq_test_key, (void *) 1l))
     FAIL_EXIT1 ("error in pthread_setspecific");
   return rseq_thread_registered () ? NULL : (void *) 1l;
@@ -141,7 +145,7 @@ do_rseq_threads_test (int nr_threads)
   int i;
   int result = 0;
 
-  cancel_thread_ready = 0;
+  //cancel_thread_ready = 0;
   for (i = 0; i < nr_threads; ++i)
     if (pthread_create (&th[i], NULL, thread_function,
                         (void *) (intptr_t) i) != 0)
@@ -149,11 +153,13 @@ do_rseq_threads_test (int nr_threads)
         FAIL_EXIT1 ("creation of thread %d failed", i);
       }
 
+#if 0
   while (!atomic_load_acquire (&cancel_thread_ready))
     usleep (100);
 
   if (pthread_cancel (th[0]))
     FAIL_EXIT1 ("error in pthread_cancel");
+#endif
 
   for (i = 0; i < nr_threads; ++i)
     {
@@ -163,6 +169,7 @@ do_rseq_threads_test (int nr_threads)
           printf ("join of thread %d failed\n", i);
           result = 1;
         }
+#if 0
       else if (i != 0 && v != NULL)
         {
           printf ("join %d successful, but child failed\n", i);
@@ -173,6 +180,13 @@ do_rseq_threads_test (int nr_threads)
           printf ("join %d successful, child did not fail as expected\n", i);
           result = 1;
         }
+#else
+      else if (v != NULL)
+        {
+          printf ("join %d successful, but child failed\n", i);
+          result = 1;
+        }
+#endif
     }
   return result;
 }
