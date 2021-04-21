@@ -48,7 +48,6 @@
 #include <array_length.h>
 #include <libc-early-init.h>
 #include <dl-main.h>
-#include <list.h>
 #include <gnu/lib-names.h>
 #include <dl-tunables.h>
 
@@ -804,9 +803,7 @@ cannot allocate TLS data structures for initial thread\n");
   const char *lossage = TLS_INIT_TP (tcbp);
   if (__glibc_unlikely (lossage != NULL))
     _dl_fatal_printf ("cannot set up thread-local storage: %s\n", lossage);
-#if THREAD_GSCOPE_IN_TCB
-  list_add (&THREAD_SELF->list, &GL (dl_stack_user));
-#endif
+  __tls_init_tp ();
   tls_init_tp_called = true;
 
   return tcbp;
@@ -1145,11 +1142,6 @@ dl_main (const ElfW(Phdr) *phdr,
     && defined __rtld_lock_default_lock_recursive
   GL(dl_rtld_lock_recursive) = rtld_lock_default_lock_recursive;
   GL(dl_rtld_unlock_recursive) = rtld_lock_default_unlock_recursive;
-#endif
-
-#if THREAD_GSCOPE_IN_TCB
-  INIT_LIST_HEAD (&GL (dl_stack_used));
-  INIT_LIST_HEAD (&GL (dl_stack_user));
 #endif
 
   /* The explicit initialization here is cheaper than processing the reloc
@@ -2440,9 +2432,7 @@ dl_main (const ElfW(Phdr) *phdr,
       if (__glibc_unlikely (lossage != NULL))
 	_dl_fatal_printf ("cannot set up thread-local storage: %s\n",
 			  lossage);
-#if THREAD_GSCOPE_IN_TCB
-      list_add (&THREAD_SELF->list, &GL (dl_stack_user));
-#endif
+      __tls_init_tp ();
     }
 
   /* Make sure no new search directories have been added.  */
