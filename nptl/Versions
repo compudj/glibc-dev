@@ -307,3 +307,9 @@ libpthread {
     __libpthread_freeres;
   }
 }
+
+ld {
+  GLIBC_PRIVATE {
+     __nptl_set_robust_list_avail;
+  }
+}
