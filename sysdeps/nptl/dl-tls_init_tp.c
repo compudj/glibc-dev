@@ -22,6 +22,7 @@
 #include <nptl/pthreadP.h>
 #include <tls.h>
 #include <rseq-internal.h>
+#include <thread_pointer.h>
 
 #define TUNABLE_NAMESPACE pthread
 #include <dl-tunables.h>
@@ -30,6 +31,10 @@
 bool __nptl_set_robust_list_avail __attribute__ ((nocommon));
 rtld_hidden_data_def (__nptl_set_robust_list_avail)
 #endif
+
+const unsigned int __rseq_flags;
+const unsigned int __rseq_size attribute_relro;
+const int __rseq_offset attribute_relro;
 
 void
 __tls_init_tp (void)
@@ -70,7 +75,23 @@ __tls_init_tp (void)
 #if HAVE_TUNABLES
     do_rseq = TUNABLE_GET (rseq, int, NULL);
 #endif
-    rseq_register_current_thread (pd, do_rseq);
+    if (rseq_register_current_thread (pd, do_rseq))
+      {
+        /* We need a writable view of the variables.  They are in
+           .data.relro and are not yet write-protected.  */
+        extern unsigned int size __asm__ ("__rseq_size");
+        size = sizeof (pd->rseq_area);
+      }
+
+#ifdef RSEQ_SIG
+    /* This should be a compile-time constant, but the current
+       infrastructure makes it difficult to determine its value.  Not
+       all targets support __thread_pointer, so set __rseq_offset only
+       if thre rseq registration may have happened because RSEQ_SIG is
+       defined.  */
+    extern int offset __asm__ ("__rseq_offset");
+    offset = (char *) &pd->rseq_area - (char *) __thread_pointer ();
+#endif
   }
 
   /* Set initial thread's stack block from 0 up to __libc_stack_end.

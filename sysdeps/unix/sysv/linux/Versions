@@ -181,3 +181,20 @@ libc {
     __netlink_assert_response;
   }
 }
+
+librt {
+  GLIBC_2.3.3 {
+    # Leftover from the int -> timer_t transition.  For ABIs that came later
+    # and do not have the symbol version, this version node is merged with
+    # the baseline version.
+    __librt_version_placeholder;
+  }
+}
+
+ld {
+  GLIBC_2.35 {
+    __rseq_flags;
+    __rseq_offset;
+    __rseq_size;
+  }
+}
