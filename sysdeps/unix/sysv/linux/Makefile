@@ -109,6 +109,12 @@ tests += tst-clone tst-clone2 tst-clone3 tst-fanotify tst-personality \
 	 tst-tgkill tst-sysvsem-linux tst-sysvmsg-linux tst-sysvshm-linux
 tests-internal += tst-ofdlocks-compat tst-sigcontext-get_pc tst-rseq
 
+ifneq (no,$(have-tunables))
+tests-internal += \
+  tst-rseq-disable \
+  # tests-internal $(have-tunables)
+endif
+
 CFLAGS-tst-sigcontext-get_pc.c = -fasynchronous-unwind-tables
 
 # Generate the list of SYS_* macros for the system calls (__NR_*
@@ -180,9 +186,12 @@ $(objpfx)tst-mman-consts.out: ../sysdeps/unix/sysv/linux/tst-mman-consts.py
 	  < /dev/null > $@ 2>&1; $(evaluate-test)
 $(objpfx)tst-mman-consts.out: $(sysdeps-linux-python-deps)
 
+
 $(objpfx)tst-gettid: $(shared-thread-library)
 $(objpfx)tst-gettid-kill: $(shared-thread-library)
 $(objpfx)tst-tgkill: $(shared-thread-library)
+
+tst-rseq-disable-ENV = GLIBC_TUNABLES=glibc.pthread.rseq=0
 
 endif # $(subdir) == misc
 
