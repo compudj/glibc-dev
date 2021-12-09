@@ -107,7 +107,7 @@ tests += tst-clone tst-clone2 tst-clone3 tst-fanotify tst-personality \
 	 test-errno-linux tst-memfd_create tst-mlock2 tst-pkey \
 	 tst-rlimit-infinity tst-ofdlocks tst-gettid tst-gettid-kill \
 	 tst-tgkill tst-sysvsem-linux tst-sysvmsg-linux tst-sysvshm-linux
-tests-internal += tst-ofdlocks-compat tst-sigcontext-get_pc
+tests-internal += tst-ofdlocks-compat tst-sigcontext-get_pc tst-rseq
 
 CFLAGS-tst-sigcontext-get_pc.c = -fasynchronous-unwind-tables
 
@@ -307,4 +307,8 @@ endif
 
 ifeq ($(subdir),nptl)
 tests += tst-align-clone tst-getpid1
+
+# tst-rseq-nptl is an internal test because it requires a definition of
+# __NR_rseq from the internal system call list.
+tests-internal += tst-rseq-nptl
 endif

@@ -21,6 +21,7 @@
 #include <list.h>
 #include <nptl/pthreadP.h>
 #include <tls.h>
+#include <rseq-internal.h>
 
 #ifndef __ASSUME_SET_ROBUST_LIST
 bool __nptl_set_robust_list_avail __attribute__ ((nocommon));
@@ -30,13 +31,14 @@ rtld_hidden_data_def (__nptl_set_robust_list_avail)
 void
 __tls_init_tp (void)
 {
+  struct pthread *pd = THREAD_SELF;
+
   /* Set up thread stack list management.  */
   INIT_LIST_HEAD (&GL (dl_stack_used));
   INIT_LIST_HEAD (&GL (dl_stack_user));
-  list_add (&THREAD_SELF->list, &GL (dl_stack_user));
+  list_add (&pd->list, &GL (dl_stack_user));
 
    /* Early initialization of the TCB.   */
-   struct pthread *pd = THREAD_SELF;
    pd->tid = INTERNAL_SYSCALL_CALL (set_tid_address, &pd->tid);
    THREAD_SETMEM (pd, specific[0], &pd->specific_1stblock[0]);
    THREAD_SETMEM (pd, user_stack, true);
@@ -59,6 +61,8 @@ __tls_init_tp (void)
 #endif
       }
   }
+
+  rseq_register_current_thread (pd);
 
   /* Set initial thread's stack block from 0 up to __libc_stack_end.
      It will be bigger than it actually is, but for unwind.c/pt-longjmp.c
