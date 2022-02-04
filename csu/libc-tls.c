@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <sys/param.h>
 #include <array_length.h>
-#include <pthreadP.h>
+#include <nptl/pthreadP.h>
 
 #ifdef SHARED
  #error makefile bug, this file is for static only
